@@ -1,4 +1,4 @@
-data/
+raw_data/
 .env
 .ipynb_checkpoints
 .python-version
