@@ -4,3 +4,4 @@ raw_data/
 .python-version
 *.ipynb
 .DS_Store
+.envrc
