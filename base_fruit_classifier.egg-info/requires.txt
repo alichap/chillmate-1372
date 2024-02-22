@@ -2,7 +2,6 @@ absl-py==2.1.0
 appnope==0.1.4
 asttokens==2.4.1
 astunparse==1.6.3
--e git+ssh://git@github.com/alichap/chillmate-1372.git@6fef5bbe72bf6118b6c200a78f67be6e2f4c48a0#egg=base_fruit_classifier
 cachetools==5.3.2
 certifi==2024.2.2
 charset-normalizer==3.3.2

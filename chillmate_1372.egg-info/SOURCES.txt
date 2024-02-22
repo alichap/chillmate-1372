@@ -1,0 +1,9 @@
+README.md
+setup.py
+base_fruit_classifier/__init__.py
+base_fruit_classifier/fruit_classifier_basic_model.py
+chillmate_1372.egg-info/PKG-INFO
+chillmate_1372.egg-info/SOURCES.txt
+chillmate_1372.egg-info/dependency_links.txt
+chillmate_1372.egg-info/requires.txt
+chillmate_1372.egg-info/top_level.txt
