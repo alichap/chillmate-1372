@@ -3,3 +3,5 @@ raw_data/
 .ipynb_checkpoints
 .python-version
 *.ipynb
+/notebooks
+.DS_Store
