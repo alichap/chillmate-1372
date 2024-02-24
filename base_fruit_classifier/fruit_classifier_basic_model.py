@@ -96,13 +96,15 @@ if __name__ == '__main__':
     #batch_size = 32
     #img_height = 180
     #img_width = 180
-    dataset_path = "/Users/andreslemus/code/alichap/chillmate-1372/raw_data/mixed datasets/"
+    dataset_path = "/Users/andreslemus/code/alichap/chillmate-1372/raw_data/fruit/"
 
     model, history = train_basic_model(dataset_path, 32, 180, 180)
 
-    print("HERE ACCuRACY AND LOSS")
+    print("HERE ACCURACY AND LOSS")
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
 
     loss = history.history['loss']
     val_loss = history.history['val_loss']
+
+    model.summary()

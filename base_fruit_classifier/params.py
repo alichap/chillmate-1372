@@ -9,4 +9,4 @@ BUCKET_NAME = os.environ.get("BUCKET_NAME")
 
 
 #### CONSTANTS ####
-LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
+LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), "chillmate_models")

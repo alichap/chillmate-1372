@@ -6,7 +6,7 @@ import os
 # Load the pre-trained InceptionV3 model
 model = InceptionV3(weights='imagenet')
 
-# Directory containing your test images
+# Directory containing my images
 image_dir = '/Users/andreslemus/code/alichap/chillmate-1372/raw_data/test_set_example'
 
 
@@ -16,7 +16,7 @@ def predict_image_class(image_path):
     img = image.load_img(image_path, target_size=(299, 299))
     img_array = image.img_to_array(img)
     img_array_expanded_dims = np.expand_dims(img_array, axis=0)
-    img_preprocessed = preprocess_input(img_array_expanded_dims) # preprocesses a tensor or numpy array encoting a btach of images
+    img_preprocessed = preprocess_input(img_array_expanded_dims) # preprocesses a tensor or numpy array encoding a batch of images
     print("PRINT DIMENSIONS EXPANDED")
     print(img_array.shape)
     print(img_array_expanded_dims.shape)
