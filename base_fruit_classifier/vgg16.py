@@ -4,7 +4,11 @@ from tensorflow.keras.applications.densenet import DenseNet201, preprocess_input
 import os
 
 # Load the pre-trained InceptionV3 model
+<<<<<<< HEAD
 model = DenseNet201(weights='imagenet')
+=======
+model = DenseNet201(weights='imagenet', include_top=False, input=)
+>>>>>>> main
 
 # Directory containing your test images
 image_dir = '/Users/andreslemus/code/alichap/chillmate-1372/raw_data/test_set_example'

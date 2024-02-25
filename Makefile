@@ -34,11 +34,17 @@ run_train:
 run_train_save_basic_model: # already working
 	python -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
 
+run_train_save_basic_model_vm: # already working
+	python3 -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
+
 run_load: # already working
 	python -c 'from base_fruit_classifier.registry import load_model; load_model()'
 
 run_get_dataset_class_names: # already working
 	python -c 'from base_fruit_classifier.main import get_dataset_classes; get_dataset_classes()'
+
+
+
 
 run_pred:
 	python -c 'from taxifare.interface.main import pred; pred()'

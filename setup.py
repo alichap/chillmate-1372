@@ -8,7 +8,11 @@ requirements = [x.strip() for x in content if "git+" not in x]
 setup(name='base_fruit_classifier',
       version="0.0.1",
       description="basic fruit classifier for chillmate project",
+<<<<<<< HEAD
       author="Chillmate",
+=======
+      author="Chillmates",
+>>>>>>> main
       authors_email="",
       #url="https://github.com/lewagon/taxi-fare",
       install_requires=requirements,
