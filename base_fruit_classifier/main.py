@@ -15,6 +15,7 @@ import pathlib
 from .fruit_classifier_basic_model import train_basic_model
 #from registry import save_model
 from .registry import save_model, load_model
+from base_fruit_classifier.params import *
 
 
 def train_save_basic_model():
@@ -63,7 +64,7 @@ def get_dataset_classes(batch_size=32, img_height=180, img_width=180):
     return class_names
 
 
-def pred(image_to_test):
+def pred():
     """
     Make a prediction using the latest trained model
     """
@@ -77,22 +78,37 @@ def pred(image_to_test):
     model = load_model()
 
     #image_path = f"/Users/andreslemus/code/alichap/chillmate-1372/raw_data/test_set_example/{image_to_test}.jpg"
-    image_path = f"../chillmate-1372/raw_data/test_set_example/{image_to_test}.jpg"
+    #image_path = f"../chillmate-1372/raw_data/test_set_example/{image_to_test}.jpg"
+    image_path = os.path.join(LOCAL_REGISTRY_PATH,'images-to-predict')
 
-    #sunflower_path = tf.keras.utils.get_file('Red_sunflower', origin=sunflower_url)
+    # Predict the class for each image in the directory
+    for filename in os.listdir(image_path):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            path_image_to_predict = os.path.join(image_path, filename)
 
-    img = tf.keras.utils.load_img(image_path, target_size=(img_height, img_width)
-)
-    img_array = tf.keras.utils.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0) # Create a batch
+            print(f"\nPredicting {filename}")
 
-    predictions = model.predict(img_array)
-    score = tf.nn.softmax(predictions[0])
+            img = tf.keras.utils.load_img(path_image_to_predict, target_size=(img_height, img_width))
+            img_array = tf.keras.utils.img_to_array(img)
+            img_array = tf.expand_dims(img_array, 0) # Create a batch
 
-    print(
-        "This image most likely belongs to {} with a {:.2f} percent confidence."
-        .format(class_names[np.argmax(score)], 100 * np.max(score))
-    )
+            predictions = model.predict(img_array)
+            score = tf.nn.softmax(predictions[0])
+
+            print(
+                "This image most likely belongs to {} with a {:.2f} percent confidence."
+                .format(class_names[np.argmax(score)], 100 * np.max(score))
+                )
+        else:
+            #print("Image is not .jpg, .jpeg or .png")
+            pass
+            #return None
+
+    return None
+
+def predict_from_gcp():
+    model = load_model()
+
 
 
 

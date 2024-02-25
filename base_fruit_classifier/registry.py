@@ -36,7 +36,7 @@ def save_model(model: keras.Model = None) -> None:
 
     # Save model locally
     #model_path = os.path.join(LOCAL_REGISTRY_PATH, "models", "chillmate",f"{timestamp}.h5")
-    model_path = os.path.join(LOCAL_REGISTRY_PATH,f"{timestamp}.h5")
+    model_path = os.path.join(LOCAL_REGISTRY_PATH, "chillmate-models",f"{timestamp}.h5")
     model.save(model_path)
 
     print("👍 Model saved on my local machine")
@@ -44,8 +44,8 @@ def save_model(model: keras.Model = None) -> None:
     if MODEL_TARGET == "gcs":
 
         model_filename = model_path.split("/")[-1] # e.g. "20230208-161047.h5" for instance
-        client = storage.Client(project="chillmate_test1")
-        bucket = client.bucket(BUCKET_NAME)
+        client = storage.Client(project=GCP_PROJECT)
+        bucket = client.bucket(BUCKET_MODELS)
         #blob = bucket.blob(f"models/{model_filename}")
         blob = bucket.blob(f"{model_filename}") # no longer saving to the subfolder models in the bucket. Not necessary
         blob.upload_from_filename(model_path)
@@ -73,7 +73,7 @@ def load_model(stage="Production") -> keras.Model:
         print(Fore.BLUE + f"\nLoad latest model from local registry..." + Style.RESET_ALL)
 
         # Get the latest model version name by the timestamp on disk
-        local_model_directory = os.path.join(LOCAL_REGISTRY_PATH)
+        local_model_directory = os.path.join(LOCAL_REGISTRY_PATH, "models")
         local_model_paths = glob.glob(f"{local_model_directory}/*")
 
         if not local_model_paths:
@@ -94,9 +94,9 @@ def load_model(stage="Production") -> keras.Model:
 
         print(Fore.BLUE + f"\nLoad latest model from GCS..." + Style.RESET_ALL)
 
-        client = storage.Client(project="chillmate_test1")
+        client = storage.Client(project=GCP_PROJECT)
         #blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models"))
-        blobs = list(client.get_bucket(BUCKET_NAME).list_blobs())
+        blobs = list(client.get_bucket(BUCKET_MODELS).list_blobs())
 
         #print("THIS IS THE BLOBS LIST")
         #for i in blobs:
@@ -113,7 +113,7 @@ def load_model(stage="Production") -> keras.Model:
 
         try:
             latest_blob = max(blobs, key=lambda x: x.updated)
-            latest_model_path_to_save = os.path.join(LOCAL_REGISTRY_PATH, latest_blob.name)
+            latest_model_path_to_save = os.path.join(LOCAL_REGISTRY_PATH,"chillmate-models",latest_blob.name)
             latest_blob.download_to_filename(latest_model_path_to_save)
 
             latest_model = keras.models.load_model(latest_model_path_to_save)
@@ -121,17 +121,44 @@ def load_model(stage="Production") -> keras.Model:
             print(" 👍 Latest model downloaded from cloud storage")
 
             latest_model_name_fetched = latest_blob.name
-            print("The name of the model feteched from GCP is: ", latest_model_name_fetched)
+            print("The name of the model fetched from GCP is: ", latest_model_name_fetched)
 
             return latest_model
         except:
-            print(f"\n🙁 No model found in GCS bucket {BUCKET_NAME}")
+            print(f"\n🙁 No model found in GCS bucket {BUCKET_MODELS}")
 
             return None
 
 
     else:
         print("CONNECTION TO GCP NOT YET AVAILABLE. ASK ANDRES")
+
+
+def load_images_to_predict():
+    '''
+    Get images to predict from Cloud Storage bicket and store them locally
+    '''
+    print(Fore.BLUE + f"\nGetting images to predict from GCS..." + Style.RESET_ALL)
+
+    client = storage.Client(project=GCP_PROJECT)
+    #blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models"))
+    blobs = list(client.get_bucket(BUCKET_IMAGES_TO_PREDICT).list_blobs())
+
+    try:
+        for blob in blobs:
+            local_path_to_save_images = os.path.join(LOCAL_REGISTRY_PATH,"images-to-predict", blob.name)
+            blob.download_to_filename(local_path_to_save_images)
+
+        print(" 👍 Images to predict successfully downloaded from cloud storage into local")
+        return None
+
+    except:
+        print(f"\n🙁 No images found in GCS bucket {BUCKET_IMAGES_TO_PREDICT}")
+
+        return None
+
+
+
 
 
 

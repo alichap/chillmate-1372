@@ -32,18 +32,22 @@ run_train:
 	python -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
 
 run_train_save_basic_model: # already working
-	python -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
+	python3 -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
 
 run_train_save_basic_model_vm: # already working
 	python3 -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
 
-run_load: # already working
+run_load_model: # already working. Returns latest model trained either from local or GCP
 	python -c 'from base_fruit_classifier.registry import load_model; load_model()'
 
 run_get_dataset_class_names: # already working
 	python -c 'from base_fruit_classifier.main import get_dataset_classes; get_dataset_classes()'
 
+run_load_images_to_predict: # already working. Download images to predict from bucket GCP into local
+	@python3 -c 'from base_fruit_classifier.registry import load_images_to_predict; load_images_to_predict()'
 
+run_predict_images: # already working. Predict images downloaded from GCP.
+	@python -c 'from base_fruit_classifier.main import pred; pred()'
 
 
 run_pred:
@@ -96,9 +100,10 @@ test_api_on_prod:
 ################### DATA SOURCES ACTIONS ################
 
 # Data sources: targets for monthly data imports
-ML_DIR=~/.lewagon/mlops
-HTTPS_DIR=https://storage.googleapis.com/datascience-mlops/taxi-fare-ny/
-GS_DIR=gs://datascience-mlops/taxi-fare-ny
+#ML_DIR=~/.lewagon/mlops
+#HTTPS_DIR=https://storage.googleapis.com/datascience-mlops/taxi-fare-ny/
+#GS_DIR=gs://datascience-mlops/taxi-fare-ny
+CM_DIR = ~/chillmate/
 
 show_sources_all:
 	-ls -laR ~/.lewagon/mlops/data
@@ -109,14 +114,20 @@ show_sources_all:
 	-gsutil ls gs://${BUCKET_NAME}
 
 reset_local_files:
+#rm -rf ${ML_DIR}
+#mkdir -p ~/.lewagon/mlops/data/
+#mkdir ~/.lewagon/mlops/data/raw
+#mkdir ~/.lewagon/mlops/data/processed
+#mkdir ~/.lewagon/mlops/training_outputs
+#mkdir ~/.lewagon/mlops/training_outputs/metrics
+#mkdir ~/.lewagon/mlops/training_outputs/models
+#mkdir ~/.lewagon/mlops/training_outputs/params
 	rm -rf ${ML_DIR}
-	mkdir -p ~/.lewagon/mlops/data/
-	mkdir ~/.lewagon/mlops/data/raw
-	mkdir ~/.lewagon/mlops/data/processed
-	mkdir ~/.lewagon/mlops/training_outputs
-	mkdir ~/.lewagon/mlops/training_outputs/metrics
-	mkdir ~/.lewagon/mlops/training_outputs/models
-	mkdir ~/.lewagon/mlops/training_outputs/params
+	mkdir -p ~/chillmate/chillmate-models/
+	mkdir -p ~/chillmate/images-to-predict
+
+
+
 
 reset_local_files_with_csv_solutions: reset_local_files
 	-curl ${HTTPS_DIR}solutions/data_query_fixture_2009-01-01_2015-01-01_1k.csv > ${ML_DIR}/data/raw/query_2009-01-01_2015-01-01_1k.csv
