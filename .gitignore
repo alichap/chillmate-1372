@@ -4,9 +4,6 @@ raw_data/
 .ipynb_checkpoints
 .python-version
 *.ipynb
-<<<<<<< HEAD
 .env
-=======
-/notebooks
->>>>>>> main
 .DS_Store
+path_to_save_model/
