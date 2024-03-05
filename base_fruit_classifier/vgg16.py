@@ -1,14 +1,10 @@
 import numpy as np
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.densenet import DenseNet201, preprocess_input, decode_predictions
+from tensorflow.keras.applications import VGG16, preprocess_input, decode_predictions
 import os
 
 # Load the pre-trained InceptionV3 model
-<<<<<<< HEAD
-model = DenseNet201(weights='imagenet')
-=======
-model = DenseNet201(weights='imagenet', include_top=False, input=)
->>>>>>> main
+model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
 
 # Directory containing your test images
 image_dir = '/Users/andreslemus/code/alichap/chillmate-1372/raw_data/test_set_example'

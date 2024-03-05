@@ -1,6 +1,7 @@
 README.md
 setup.py
 base_fruit_classifier/InceptionV3.py
+base_fruit_classifier/InceptionV3_custom.py
 base_fruit_classifier/ResNet-50.py
 base_fruit_classifier/__init__.py
 base_fruit_classifier/fruit_classifier_basic_model.py

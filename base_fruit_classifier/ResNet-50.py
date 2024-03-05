@@ -7,7 +7,7 @@ import os
 model = ResNet50(weights='imagenet')
 
 # Directory containing your test images
-image_dir = '/Users/andreslemus/code/alichap/chillmate-1372/raw_data/test_set_example'
+image_dir = '/Users/andreslemus/code/alichap/chillmate-1372/raw_data/images-to-predict'
 
 # Function to predict the class of an image
 def predict_image_class(image_path):

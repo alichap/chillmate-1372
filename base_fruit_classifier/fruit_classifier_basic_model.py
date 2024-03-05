@@ -13,14 +13,14 @@ import pathlib
 
 def train_basic_model(dataset_path, batch_size, img_height, img_width):
 
-    data_dir = pathlib.Path(dataset_path)
+    #data_dir = pathlib.Path(dataset_path)
 
     #batch_size = 32
     #img_height = 180
     #img_width = 180
 
     train_ds, val_ds = tf.keras.utils.image_dataset_from_directory(
-    data_dir,
+    dataset_path,
     validation_split=0.2,
     subset="both",
     seed=123,
@@ -92,12 +92,12 @@ def train_basic_model(dataset_path, batch_size, img_height, img_width):
 
 
 if __name__ == '__main__':
-    pass
+    #pass
     #batch_size = 32
     #img_height = 180
     #img_width = 180
-    dataset_path = "/Users/andreslemus/code/alichap/chillmate-1372/raw_data/fruit/"
-
+    #dataset_path = "/Users/andreslemus/code/alichap/chillmate-1372/raw_data/fruit/"
+    dataset_path = "gs://chillmate_tiny_dataset/"
     model, history = train_basic_model(dataset_path, 32, 180, 180)
 
     print("HERE ACCURACY AND LOSS")

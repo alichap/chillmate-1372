@@ -2,6 +2,8 @@ import glob
 import os
 import time
 import pickle
+from PIL import Image
+import io
 
 from colorama import Fore, Style
 from tensorflow import keras
@@ -22,12 +24,15 @@ from base_fruit_classifier.params import *
 
 
 
-def save_model(model: keras.Model = None) -> None:
+def save_model(model: keras.Model = None, model_type=None) -> None:
     """
     Persist trained model locally on the hard drive at f"{LOCAL_REGISTRY_PATH}/models/{timestamp}.h5"
     - if MODEL_TARGET='gcs', also persist it in your bucket on GCS at "models/{timestamp}.h5" --> unit 02 only
     - if MODEL_TARGET='mlflow', also persist it on MLflow instead of GCS (for unit 0703 only) --> unit 03 only
     """
+
+    if model_type not in ["resnet50", "vgg16", "basic"]:
+        print("Model type entered not saveable in GCP bucket")
 
     #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
     #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), "chillmate_models")
@@ -36,7 +41,7 @@ def save_model(model: keras.Model = None) -> None:
 
     # Save model locally
     #model_path = os.path.join(LOCAL_REGISTRY_PATH, "models", "chillmate",f"{timestamp}.h5")
-    model_path = os.path.join(LOCAL_REGISTRY_PATH, "chillmate-models",f"{timestamp}.h5")
+    model_path = os.path.join(LOCAL_REGISTRY_PATH, "chillmate-models", model_type,f"{timestamp}_{model_type}.keras")
     model.save(model_path)
 
     print("👍 Model saved on my local machine")
@@ -47,7 +52,7 @@ def save_model(model: keras.Model = None) -> None:
         client = storage.Client(project=GCP_PROJECT)
         bucket = client.bucket(BUCKET_MODELS)
         #blob = bucket.blob(f"models/{model_filename}")
-        blob = bucket.blob(f"{model_filename}") # no longer saving to the subfolder models in the bucket. Not necessary
+        blob = bucket.blob(f"{model_type}/{model_filename}") # no longer saving to the subfolder models in the bucket. Not necessary
         blob.upload_from_filename(model_path)
 
         print("👍 Model saved to GCS")
@@ -55,15 +60,13 @@ def save_model(model: keras.Model = None) -> None:
         return None
 
 
-def load_model(stage="Production") -> keras.Model:
+def load_trained_model(model_type) -> keras.Model:
     """
     Return a saved model:
     - locally (latest one in alphabetical order)
     - or from GCS (most recent one) if MODEL_TARGET=='gcs'  --> for unit 02 only
     - or from MLFLOW (by "stage") if MODEL_TARGET=='mlflow' --> for unit 03 only
-
     Return None (but do not Raise) if no model is found
-
     """
 
     #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), "chillmate_models")
@@ -92,24 +95,11 @@ def load_model(stage="Production") -> keras.Model:
 
     elif MODEL_TARGET == "gcs":
 
-        print(Fore.BLUE + f"\nLoad latest model from GCS..." + Style.RESET_ALL)
+        print(Fore.BLUE + f"\nLoading latest model from GCS..." + Style.RESET_ALL)
 
         client = storage.Client(project=GCP_PROJECT)
         #blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models"))
-        blobs = list(client.get_bucket(BUCKET_MODELS).list_blobs())
-
-        #print("THIS IS THE BLOBS LIST")
-        #for i in blobs:
-        #    print(i)
-        #print("NOW THE LATEST BLOB")
-        #latest_blob = max(blobs, key=lambda x: x.updated)
-        #print(latest_blob)
-        #print("LATEST BLOB PATH TO SAVE")
-        #latest_model_path_to_save = os.path.join(LOCAL_REGISTRY_PATH, latest_blob.name)
-        #print(latest_model_path_to_save)
-        #print("AND THIS IS LATEST MODEL")
-        #latest_model = keras.models.load_model(latest_model_path_to_save)
-        #print(latest_model)
+        blobs = list(client.get_bucket(BUCKET_MODELS).list_blobs(prefix=model_type))
 
         try:
             latest_blob = max(blobs, key=lambda x: x.updated)
@@ -121,7 +111,7 @@ def load_model(stage="Production") -> keras.Model:
             print(" 👍 Latest model downloaded from cloud storage")
 
             latest_model_name_fetched = latest_blob.name
-            print("The name of the model fetched from GCP is: ", latest_model_name_fetched)
+            print("The model fetched is: ", latest_model_name_fetched)
 
             return latest_model
         except:
@@ -132,11 +122,45 @@ def load_model(stage="Production") -> keras.Model:
 
     else:
         print("CONNECTION TO GCP NOT YET AVAILABLE. ASK ANDRES")
+        return None
 
 
-def load_images_to_predict():
+
+def download_training_dataset():
     '''
-    Get images to predict from Cloud Storage bicket and store them locally
+    Get images to train the model from Cloud Storage bucket dataset and store them locally.
+    If some folders or images already exist in destination, it overwrites them all.
+    '''
+    print(Fore.BLUE + f"\nGetting dataset images from GCS..." + Style.RESET_ALL)
+
+    client = storage.Client(project=GCP_PROJECT)
+    #blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models"))
+    blobs = list(client.get_bucket(BUCKET_DATASET).list_blobs())
+    blobs_count = len(blobs)
+
+    # Ensure that the base directory exists
+    base_dir = os.path.join(LOCAL_REGISTRY_PATH, "dataset")
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+
+    try:
+        for blob in blobs:
+            local_path_to_save_images = os.path.join(LOCAL_REGISTRY_PATH,"dataset", blob.name)
+            os.makedirs(os.path.dirname(local_path_to_save_images), exist_ok=True) # Create directories as needed
+            blob.download_to_filename(local_path_to_save_images)
+
+        print(f"👍 Successfully downloaded {blobs_count} items from cloud storage into local")
+        return None
+
+    except:
+        print(f"\n🙁 No images found in GCS bucket {BUCKET_DATASET}")
+
+        return None
+
+
+def download_images_to_predict():
+    '''
+    Get images to predict from Cloud Storage bucket and store them locally
     '''
     print(Fore.BLUE + f"\nGetting images to predict from GCS..." + Style.RESET_ALL)
 
@@ -144,13 +168,23 @@ def load_images_to_predict():
     #blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models"))
     blobs = list(client.get_bucket(BUCKET_IMAGES_TO_PREDICT).list_blobs())
 
+    images = []
+
     try:
         for blob in blobs:
             local_path_to_save_images = os.path.join(LOCAL_REGISTRY_PATH,"images-to-predict", blob.name)
             blob.download_to_filename(local_path_to_save_images)
 
+            # After downloading, open the image and append it to the images list
+            with open(local_path_to_save_images, 'rb') as image_file:
+                image = Image.open(image_file)
+                image.load()  # Make sure PIL has read the image data
+                images.append(image)
+
         print(" 👍 Images to predict successfully downloaded from cloud storage into local")
-        return None
+        return images
+
+
 
     except:
         print(f"\n🙁 No images found in GCS bucket {BUCKET_IMAGES_TO_PREDICT}")
@@ -158,9 +192,61 @@ def load_images_to_predict():
         return None
 
 
+def count_items_in_bucket_dataset():
+    client = storage.Client(project=GCP_PROJECT)
+    blobs = list(client.get_bucket(BUCKET_DATASET).list_blobs())
+    print("There are",len(blobs), "items in the bucket dataset")
+
+    return
+
+
+def print_items_in_bucket_dataset():
+    client = storage.Client(project=GCP_PROJECT)
+    blobs = list(client.get_bucket(BUCKET_DATASET).list_blobs())
+    for i in blobs:
+        print(i.name)
+
+    return
+
+
+def get_dataset_classes(dataset_bucket_name):
+    """
+    Get the classes of the dataset the model was trained on. These are necessary
+    to determine the range of classes the prediction belongs to.
+    """
+
+    #dataset_path = "gs://chillmate_dataset/"
+
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(dataset_bucket_name)
+    iterator = bucket.list_blobs(prefix="", delimiter='/')
+    prefixes = set()
+
+    for page in iterator.pages:
+        prefixes.update(page.prefixes)
+
+    # Extract the class names from the prefixes
+    class_names = [prefix.split('/')[-2] for prefix in prefixes if prefix.endswith('/')]
+    print("There are:", len(class_names), "classes")
+    #print(class_names)
+
+    return class_names
 
 
 
 
 if __name__ == '__main__':
-    pass
+    #pass
+
+    #dataset_path = "gs://chillmate_tiny_dataset/"
+    #dataset_bucket_name = "chillmate_tiny_dataset"
+    #get_dataset_classes(dataset_bucket_name)
+    #print(get_dataset_classes(dataset_bucket_name))
+
+    model = load_trained_model(model_type="resnet50")
+    model.summary()
+
+    #count_items_in_bucket_dataset()
+    #images1 = download_images_to_predict()
+    #for i in images1:
+    #    print(i)

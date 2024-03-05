@@ -32,22 +32,44 @@ run_train:
 	python -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
 
 run_train_save_basic_model: # already working
-	python3 -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
+	@python3 -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
+
+run_train_save_resnet50: # already working
+	@python3 -c 'from base_fruit_classifier.main import train_save_resnet50; train_save_resnet50()'
 
 run_train_save_basic_model_vm: # already working
-	python3 -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
+	@python3 -c 'from base_fruit_classifier.main import train_save_basic_model; train_save_basic_model()'
 
 run_load_model: # already working. Returns latest model trained either from local or GCP
-	python -c 'from base_fruit_classifier.registry import load_model; load_model()'
+	@python3 -c 'from base_fruit_classifier.registry import load_model; load_model()'
 
 run_get_dataset_class_names: # already working
-	python -c 'from base_fruit_classifier.main import get_dataset_classes; get_dataset_classes()'
+	@python3 -c 'from base_fruit_classifier.main import get_dataset_classes; get_dataset_classes()'
 
-run_load_images_to_predict: # already working. Download images to predict from bucket GCP into local
-	@python3 -c 'from base_fruit_classifier.registry import load_images_to_predict; load_images_to_predict()'
+run_download_images_to_predict: # already working. Download images to predict from bucket GCP into local
+	@python3 -c 'from base_fruit_classifier.registry import download_images_to_predict; download_images_to_predict()'
 
-run_predict_images: # already working. Predict images downloaded from GCP.
-	@python -c 'from base_fruit_classifier.main import pred; pred()'
+run_predict_vgg16: # already working. Predict images downloaded from GCP.
+	@python3 -c 'from base_fruit_classifier.main import predict; predict(model_type="vgg16", img_height=348, img_width=348)'
+
+
+run_predict_resnet50: # already working. Predict images downloaded from GCP.
+	@python3 -c 'from base_fruit_classifier.main import predict; predict(model_type="resnet50", img_height=100, img_width=100)'
+
+
+run_count_items_in_bucket_dataset: # already working.Return number of items in bucket dataset
+	@python3 -c 'from base_fruit_classifier.registry import count_items_in_bucket_dataset; count_items_in_bucket_dataset()'
+
+
+run_print_items_bucket_dataset: # already working. Prints names of items in bucket dataset
+	@python3 -c 'from base_fruit_classifier.registry import print_items_in_bucket_dataset; print_items_in_bucket_dataset()'
+
+run_download_training_dataset: # already working. Prints names of items in bucket dataset
+	@python3 -c 'from base_fruit_classifier.registry import download_training_dataset; download_training_dataset()'
+
+run_train_save_vgg16: # already working.
+	@python3 -c 'from base_fruit_classifier.main import train_save_vgg16; train_save_vgg16()'
+
 
 
 run_pred:
@@ -114,18 +136,13 @@ show_sources_all:
 	-gsutil ls gs://${BUCKET_NAME}
 
 reset_local_files:
-#rm -rf ${ML_DIR}
-#mkdir -p ~/.lewagon/mlops/data/
-#mkdir ~/.lewagon/mlops/data/raw
-#mkdir ~/.lewagon/mlops/data/processed
-#mkdir ~/.lewagon/mlops/training_outputs
-#mkdir ~/.lewagon/mlops/training_outputs/metrics
-#mkdir ~/.lewagon/mlops/training_outputs/models
-#mkdir ~/.lewagon/mlops/training_outputs/params
-	rm -rf ${ML_DIR}
-	mkdir -p ~/chillmate/chillmate-models/
-	mkdir -p ~/chillmate/images-to-predict
-
+	@rm -rf ${ML_DIR}
+	@mkdir -p ~/chillmate/chillmate-models/
+	@mkdir -p ~/chillmate/chillmate-models/vgg16
+	@mkdir -p ~/chillmate/chillmate-models/resnet50
+	@mkdir -p ~/chillmate/chillmate-models/basic
+	@mkdir -p ~/chillmate/images-to-predict
+	@mkdir -p ~/chillmate/dataset
 
 
 
