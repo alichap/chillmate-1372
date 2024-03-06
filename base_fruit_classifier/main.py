@@ -82,10 +82,10 @@ def train_save_vgg16():
 
     model = train_vgg16a(dataset_path)
 
+    model.summary()
+
      # Save the model
     save_model(model, "vgg16")
-
-    #model.summary()
 
     return None
 
