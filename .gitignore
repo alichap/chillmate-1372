@@ -7,3 +7,4 @@ raw_data/
 .env
 .DS_Store
 path_to_save_model/
+logs/

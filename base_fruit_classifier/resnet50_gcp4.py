@@ -22,7 +22,10 @@ from tensorflow.keras.layers import Dropout
 from base_fruit_classifier.main import *
 from base_fruit_classifier.registry import *
 
-def train_resnet50(dataset_path, num_classes):
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+import datetime
+
+def train_resnet50(dataset_path, num_classes, epochs):
     # Load the pre-trained ResNet50 model without the top layer
     base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(100, 100, 3))
 
@@ -44,6 +47,12 @@ def train_resnet50(dataset_path, num_classes):
 
     # Early stopping callback
     early_stopping = EarlyStopping(monitor='val_loss', patience=10, verbose=1, mode='min', restore_best_weights=True)
+
+
+    # TensorBoard callback
+    logdir = "logs/adam/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = TensorBoard(log_dir=logdir, histogram_freq=1)
+
 
     # Configure the dataset for performance
     AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -72,9 +81,9 @@ def train_resnet50(dataset_path, num_classes):
     # Train the model with early stopping
     model.fit(
         train_dataset,
-        epochs=2, # Adjust epochs according to your needs
+        epochs=epochs, # from arguments
         validation_data=validation_dataset,
-        callbacks=[early_stopping]
+        callbacks=[early_stopping, tensorboard_callback]
     )
 
     return model

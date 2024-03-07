@@ -24,6 +24,11 @@
       pip install .
 
 7.
+Tensorboard access:
+
+tensorboard --logdir=/home/andreslemus/project5/logs/adam/20240307-080015 --host=0.0.0.0 --port=6007
 
 
-I am working on a machine learning project and created a virtual machine on google compute engine to train my models. I have access to this virtual machine directly from my local terminal through "gcloud compute ssh chillmate-vm2 --project chillmate-test1 ". I hae also access to the virtual machine from the SSH-in-browser terminal directly on compute engine. I started working on the virtual machine connecting frorm my local terminal and installed on it python 3.10.6. However, the python version on the virtual machine when connecting through SSH-in-browser looks different. For example, the python version is 3.8.10. Furthermore, a few packages I installed in the VM when connected from my terminal do not seem to be installed on the virtual machine when connected through the SSH-in-browser. Please explain why this difference and what to do to have the same changes and packages installed in the VM when connecting directly from y local terminal and when connecting from SSH-in-browser.
+Install tree
+sudo apt-get update
+sudo apt-get install tree

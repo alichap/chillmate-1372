@@ -54,16 +54,16 @@ def train_save_basic_model():
     return None
 
 
-def train_save_resnet50():
-    dataset_path = "gs://chillmate_tiny_dataset/"
-    dataset_bucket_name = "chillmate_tiny_dataset"
+def train_save_resnet50(epochs=100):
+    dataset_path = "gs://chillmate_dataset/"
+    dataset_bucket_name = "chillmate_dataset"
     #dataset_path = "gs://chillmate_dataset/"
     #dataset_bucket_name = "chillmate_dataset"
     num_classes = len(get_dataset_classes(dataset_bucket_name))
 
     #dataset_path = //BUCKET_DATASET
 
-    model = train_resnet50(dataset_path, num_classes)
+    model = train_resnet50(dataset_path, num_classes, epochs)
 
      # Save the model
     save_model(model, "resnet50")
@@ -193,5 +193,6 @@ if __name__ == '__main__':
     #train_save_vgg16()
     #pred_from_gcs()
     #pred_from_gcs()
-    predict(model_type="vgg16", img_height=348, img_width=348)
+    #predict(model_type="vgg16", img_height=348, img_width=348)
     #predict(model_type="resnet50", img_height=100, img_width=100)
+    train_save_resnet50(5)
