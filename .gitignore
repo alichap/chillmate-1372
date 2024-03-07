@@ -7,3 +7,7 @@ raw_data/
 .env
 .DS_Store
 path_to_save_model/
+__pycache__/
+first_image.jpg
+first_image_2.jpg
+gfg_dummy_pic.jpg

@@ -1,48 +1,100 @@
+# Les imports
 import streamlit as st
+import numpy as np
+
+import PIL
+from PIL import Image
+
+from time import sleep
+from stqdm import stqdm
 
 '''
-# TaxiFareModel front
+# CHILLMATE your next recipe buddy.
 '''
+img_width=800
+img_height=600
+crop_width=348
+crop_height=348
 
-st.markdown('''
-Remember that there are several ways to output content into your web page...
-
-Either as with the title by just creating a string (or an f-string). Or as with this paragraph using the `st.` functions
-''')
-
-'''
-## Here we would like to add some controllers in order to ask the user to select the parameters of the ride
-
-1. Let's ask for:
-- date and time
-- pickup longitude
-- pickup latitude
-- dropoff longitude
-- dropoff latitude
-- passenger count
-'''
+list = []
+validation_ingredients = False
+go = False
 
 '''
-## Once we have these, let's call our API in order to retrieve a prediction
-
-See ? No need to load a `model.joblib` file in this app, we do not even need to know anything about Data Science in order to retrieve a prediction...
-
-🤔 How could we call our API ? Off course... The `requests` package 💡
+## Les aliments contenus dans votre frigo.
 '''
 
-url = 'https://taxifare.lewagon.ai/predict'
+uploaded_files = st.file_uploader("Upload your fridge images", accept_multiple_files=True, type=["png", "jpg", "jpeg"])
 
-if url == 'https://taxifare.lewagon.ai/predict':
+if uploaded_files is not None:
 
-    st.markdown('Maybe you want to use your own API for the prediction, not the one provided by Le Wagon...')
+    for uploaded_file in uploaded_files:
+        raw_image = Image.open(uploaded_file)
+        raw_image = raw_image.save('first_image.jpg')
+        st.text('Voici l\'image que vous avez chargée')
+        st.image('first_image.jpg')
+
+        raw_image = Image.open('first_image.jpg')
+        image_resized = raw_image.resize((800, 600))
+
+        '''Votre image sera rognée de cette façon :'''
+        image_resized = image_resized.crop(((img_width - crop_width) // 2,
+                            (img_height - crop_height) // 2,
+                            (img_width + crop_width) // 2,
+                            (img_height + crop_height) // 2)
+                        )
+        st.image(image_resized)
+
+        list.append('Tomato')
+        list.append('Banana')
 
 '''
-
-2. Let's build a dictionary containing the parameters for our API...
-
-3. Let's call our API using the `requests` package...
-
-4. Let's retrieve the prediction from the **JSON** returned by the API...
-
-## Finally, we can display the prediction to the user
+## Les aliments qui ne sont pas contenus dans votre frigo.
 '''
+
+st.write('Veuillez sélectionner la liste des condiments à votre disposition pour compléter les aliments contenus dans votre frigo :')
+
+salt = st.checkbox('Salt')
+pepper = st.checkbox('Pepper')
+olive_oil = st.checkbox('Olive oil')
+sugar = st.checkbox('Sugar')
+flour = st.checkbox('Flour')
+
+if salt:
+    list.append('Salt')
+if pepper:
+    list.append('Pepper')
+if olive_oil:
+    list.append('Olive oil')
+if sugar:
+    list.append('Sugar')
+if flour:
+    list.append('Flour')
+
+'''
+## Validez les ingrédients sélectionnés.
+'''
+
+if list is not None:
+    st.write('Voici la liste des ingrédients disponibles :')
+    for ingredient in list:
+        st.write(ingredient)
+
+if st.button('valider la liste des ingrédients'):
+    validation_ingredients = True
+    st.write('La liste des ingrédients est validée.')
+
+'''
+## Lancer la recherche de recette.
+'''
+
+if st.button('Cliquez pour découvrir votre recette'):
+    st.write('Voici les 3 recettes que nous vous proposons :')
+    st.write('- a')
+    st.write('- b')
+    st.write('- c')
+
+#if start_loading_animation == True:
+#    for _ in stqdm(range(10)):
+#        sleep(0.5)
+#    st.write('Computing finished')
