@@ -23,6 +23,8 @@ from base_fruit_classifier.registry import *
 
 from base_fruit_classifier.resnet50_gcp4 import *
 from base_fruit_classifier.vgg16a import *
+from base_fruit_classifier.xception import *
+
 
 
 def train_save_basic_model():
@@ -84,6 +86,22 @@ def train_save_vgg16():
 
      # Save the model
     save_model(model, "vgg16")
+
+    #model.summary()
+
+    return None
+
+
+def train_save_xception():
+    dataset_path = "gs://chillmate_tiny_dataset/"
+    dataset_bucket_name = "chillmate_tiny_dataset"
+
+    num_classes = len(get_dataset_classes(dataset_bucket_name)) # just in case this parameter is needed
+
+    model = train_xception()
+
+     # Save the model
+    save_model(model, "xception")
 
     #model.summary()
 
@@ -195,4 +213,5 @@ if __name__ == '__main__':
     #pred_from_gcs()
     #predict(model_type="vgg16", img_height=348, img_width=348)
     #predict(model_type="resnet50", img_height=100, img_width=100)
-    train_save_resnet50(5)
+    #train_save_resnet50(5)
+    train_save_xception()
