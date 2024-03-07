@@ -1,12 +1,8 @@
 # Les imports
 import streamlit as st
 import numpy as np
-
 import PIL
 from PIL import Image
-
-from time import sleep
-from stqdm import stqdm
 
 '''
 # CHILLMATE your next recipe buddy.
@@ -94,7 +90,20 @@ if st.button('Cliquez pour découvrir votre recette'):
     st.write('- b')
     st.write('- c')
 
-#if start_loading_animation == True:
-#    for _ in stqdm(range(10)):
-#        sleep(0.5)
-#    st.write('Computing finished')
+
+#params = dict(
+#    pickup_datetime=pickup_datetime,
+#    pickup_longitude=pickup_longitude,
+#    pickup_latitude=pickup_latitude,
+#    dropoff_longitude=dropoff_longitude,
+#    dropoff_latitude=dropoff_latitude,
+#    passenger_count=passenger_count)
+
+#wagon_cab_api_url = 'https://taxifare.lewagon.ai/predict'
+#response = requests.get(wagon_cab_api_url, params=params)
+
+#prediction = response.json()
+
+#pred = prediction['fare']
+
+#st.header(f'Fare amount: ${round(pred, 2)}')
