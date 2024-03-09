@@ -1,7 +1,8 @@
 from fastapi import FastAPI
-import pickle
+import requests
 #from base_fruit_classifier.xception-model import train_xception
-from base_fruit_classifier.model_test import forecast
+#from base_fruit_classifier.model_test import forecast
+from base_fruit_classifier.main import predict_in_prod_img
 
 app = FastAPI()
 
@@ -11,10 +12,20 @@ app = FastAPI()
 def status():
     return {"API": "connected"}
 
-@app.get("/predict")
-def predict(X):
+#@app.get("/predict")
+#def predict(X):
 
     #model = pickle.load_model()
-    prediction = forecast(X)
+    #prediction = predict_in_prod_img(X)
 
-    return {'forecast': prediction}
+    #return {'image_predict': prediction}
+
+
+url = 'http://localhost:8000/predict'
+
+params = {
+    'image_predict': 0
+}
+
+response = requests.get(url, params=params)
+response.json() #=> {wait: 64}
