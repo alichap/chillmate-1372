@@ -93,7 +93,7 @@ run_workflow:
 	PREFECT__LOGGING__LEVEL=${PREFECT_LOG_LEVEL} python -m taxifare.interface.workflow
 
 run_api:
-	uvicorn taxifare.api.fast:app --reload
+	uvicorn chillmate-api.api.fast:app --reload
 
 ##################### TESTS #####################
 test_gcp_setup:
