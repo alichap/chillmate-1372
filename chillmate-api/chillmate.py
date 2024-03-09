@@ -19,6 +19,5 @@ async def create_upload_file(file: UploadFile= File(...)):
         f.write(contents)
     img_path = f'data/{file.filename}'
     prediction = predict_in_prod_img(img_path)
-    return {"label": img_path,
-            "balbla": prediction
+    return {"label": prediction
             }

@@ -224,8 +224,10 @@ def predict_in_prod_img(img_path):
         It uses the most recent model specified in the variable model_type
     '''
 
-    class_names = ['Apple','Aubergine','Avocado','Banana','Bean','Broccoli','Cabbage','Carrots','Corn','Cucumber',
-                    'Egg','Garlic','Leek_lot','Onion','Pear','Pepper','Potato','Salmon','Tomato','Zucchini'] # dataset reference classes
+    #class_names = ['Apple','Aubergine','Avocado','Banana','Bean','Broccoli','Cabbage','Carrots','Corn','Cucumber',
+    #                'Egg','Garlic','Leek_lot','Onion','Pear','Pepper','Potato','Salmon','Tomato','Zucchini'] # dataset reference classes
+
+    class_names = get_dataset_classes(BUCKET_DATASET) # dataset reference classes
 
     model_type= "resnet50" # model to use
     img_height = 100
