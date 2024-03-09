@@ -15,13 +15,12 @@ COPY base_fruit_classifier base_fruit_classifier
 COPY setup.py setup.py
 RUN pip install .
 
-EXPOSE 8000
+#EXPOSE 8000
 
 # controls functinnality of the container
 # uvicorn to control the server port
 # local
 
-CMD uvicorn app_folder.app_file:app --host 0.0.0.0
-
+#CMD uvicorn chillmate-api.chillmate:app --host 0.0.0.0
 # Deploy to GCP
-#CMD uvicorn app_folder.app_file:app --host 0.0.0.0 --port $PORT
+CMD uvicorn chillmate-api.chillmate:app --host 0.0.0.0 --port $PORT
