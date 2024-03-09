@@ -190,9 +190,9 @@ def predict_in_prod():
 
     class_names = get_dataset_classes(BUCKET_DATASET) # dataset reference classes
 
-    model_type= "vgg16" # model to use
-    img_height = 348
-    img_width = 348
+    model_type= "resnet50" # model to use
+    img_height = 100
+    img_width = 100
 
     model = load_trained_model(model_type)
     download_images_to_predict()
