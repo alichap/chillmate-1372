@@ -243,10 +243,11 @@ if __name__ == '__main__':
     #get_dataset_classes(dataset_bucket_name)
     #print(get_dataset_classes(dataset_bucket_name))
 
-    model = load_trained_model(model_type="resnet50")
-    model.summary()
+    #model = load_trained_model(model_type="resnet50")
+    #model.summary()
 
     #count_items_in_bucket_dataset()
     #images1 = download_images_to_predict()
     #for i in images1:
     #    print(i)
+    count_items_in_bucket_dataset()
