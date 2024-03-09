@@ -32,3 +32,18 @@ tensorboard --logdir=/home/andreslemus/project5/logs/adam/20240307-080015 --host
 Install tree
 sudo apt-get update
 sudo apt-get install tree
+
+
+Github process
+- git status
+- git add .
+- git commit -m "added functions and structure for xception model"
+- git checkout main
+- git status
+- git pull origin main
+- git checkout xception_functions
+- git merge main
+- git checkout main
+- git merge xception_functions
+- git push origin main
+- git checkout -b additional_models_vms

@@ -9,33 +9,16 @@ from colorama import Fore, Style
 from tensorflow import keras
 from google.cloud import storage
 
-#from params import MODEL_TARGET
-#from params import BUCKET_NAME
-
-#from .params import MODEL_TARGET
-#from .params import BUCKET_NAME
-
 from base_fruit_classifier.params import *
-
-#from taxifare.params import *
-#import mlflow
-#from mlflow.tracking import MlflowClient
-
-
 
 
 def save_model(model: keras.Model = None, model_type=None) -> None:
-    """
-    Persist trained model locally on the hard drive at f"{LOCAL_REGISTRY_PATH}/models/{timestamp}.h5"
-    - if MODEL_TARGET='gcs', also persist it in your bucket on GCS at "models/{timestamp}.h5" --> unit 02 only
-    - if MODEL_TARGET='mlflow', also persist it on MLflow instead of GCS (for unit 0703 only) --> unit 03 only
-    """
+    '''
+    Saves model to local or GCP
+    '''
 
-    if model_type not in ["resnet50", "vgg16", "basic"]:
+    if model_type not in ["resnet50", "vgg16", "basic", "xception"]:
         print("Model type entered not saveable in GCP bucket")
-
-    #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), ".lewagon", "mlops", "training_outputs")
-    #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), "chillmate_models")
 
     timestamp = time.strftime("%Y%m%d-%H%M%S")
 
@@ -48,11 +31,11 @@ def save_model(model: keras.Model = None, model_type=None) -> None:
 
     if MODEL_TARGET == "gcs":
 
-        model_filename = model_path.split("/")[-1] # e.g. "20230208-161047.h5" for instance
+        model_filename = model_path.split("/")[-1] #
         client = storage.Client(project=GCP_PROJECT)
         bucket = client.bucket(BUCKET_MODELS)
         #blob = bucket.blob(f"models/{model_filename}")
-        blob = bucket.blob(f"{model_type}/{model_filename}") # no longer saving to the subfolder models in the bucket. Not necessary
+        blob = bucket.blob(f"{model_type}/{model_filename}")
         blob.upload_from_filename(model_path)
 
         print("👍 Model saved to GCS")
@@ -62,11 +45,7 @@ def save_model(model: keras.Model = None, model_type=None) -> None:
 
 def load_trained_model(model_type) -> keras.Model:
     """
-    Return a saved model:
-    - locally (latest one in alphabetical order)
-    - or from GCS (most recent one) if MODEL_TARGET=='gcs'  --> for unit 02 only
-    - or from MLFLOW (by "stage") if MODEL_TARGET=='mlflow' --> for unit 03 only
-    Return None (but do not Raise) if no model is found
+
     """
 
     #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), "chillmate_models")
@@ -108,10 +87,11 @@ def load_trained_model(model_type) -> keras.Model:
 
             latest_model = keras.models.load_model(latest_model_path_to_save)
 
-            print(" 👍 Latest model downloaded from cloud storage")
+
+            print("👍 Latest model downloaded from cloud storage")
 
             latest_model_name_fetched = latest_blob.name
-            print("The model fetched is: ", latest_model_name_fetched)
+            print("The model fetched is:", latest_model_name_fetched)
 
             return latest_model
         except:
@@ -194,6 +174,7 @@ def download_images_to_predict():
 
 def count_items_in_bucket_dataset():
     client = storage.Client(project=GCP_PROJECT)
+    #blobs = list(client.get_bucket(BUCKET_DATASET).list_blobs())
     blobs = list(client.get_bucket(BUCKET_DATASET).list_blobs())
     print("There are",len(blobs), "items in the bucket dataset")
 
@@ -207,6 +188,16 @@ def print_items_in_bucket_dataset():
         print(i.name)
 
     return
+
+
+def print_items_in_models_dataset():
+    client = storage.Client(project=GCP_PROJECT)
+    blobs = list(client.get_bucket(BUCKET_MODELS).list_blobs())
+    for i in blobs:
+        print(i.name)
+
+    return
+
 
 
 def get_dataset_classes(dataset_bucket_name):
@@ -235,6 +226,7 @@ def get_dataset_classes(dataset_bucket_name):
 
 
 
+
 if __name__ == '__main__':
     #pass
 
@@ -251,4 +243,7 @@ if __name__ == '__main__':
     #for i in images1:
     #    print(i)
 
-    count_items_in_bucket_dataset()
+    #count_items_in_bucket_dataset()
+    model = load_trained_model(model_type="resnet50")
+    model.summary()
+    #print_items_in_models_dataset()

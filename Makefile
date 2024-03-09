@@ -70,8 +70,13 @@ run_download_training_dataset: # already working. Prints names of items in bucke
 run_train_save_vgg16: # already working.
 	@python3 -c 'from base_fruit_classifier.main import train_save_vgg16; train_save_vgg16()'
 
+run_train_save_vgg16al: # already working.
+	@python3 -c 'from base_fruit_classifier.main import train_save_vgg16al; train_save_vgg16al()'
+
 run_train_save_xception: # already working.
 	@python3 -c 'from base_fruit_classifier.main import train_save_xception; train_save_xception()'
+
+
 
 
 

@@ -12,10 +12,6 @@ from PIL import Image
 import pathlib
 from base_fruit_classifier.params import *
 
-#from fruit_classifier_basic_model import train_basic_model
-#from .fruit_classifier_basic_model import train_basic_model
-#from registry import save_model
-#from .registry import save_model, load_model
 from base_fruit_classifier.params import *
 from google.cloud import storage
 from base_fruit_classifier.fruit_classifier_basic_model import *
@@ -23,6 +19,7 @@ from base_fruit_classifier.registry import *
 
 from base_fruit_classifier.resnet50_gcp4 import *
 from base_fruit_classifier.vgg16a import *
+from base_fruit_classifier.vgg16al import *
 from base_fruit_classifier.xception import *
 
 
@@ -57,10 +54,13 @@ def train_save_basic_model():
 
 
 def train_save_resnet50(epochs=100):
-    dataset_path = "gs://chillmate_dataset/"
-    dataset_bucket_name = "chillmate_dataset"
     #dataset_path = "gs://chillmate_dataset/"
     #dataset_bucket_name = "chillmate_dataset"
+    #dataset_path = "gs://chillmate_dataset/"
+    #dataset_bucket_name = "chillmate_dataset"
+    dataset_path = "gs://chillmate-dataset-mix-0306/"
+    dataset_bucket_name = "chillmate-dataset-mix-0306"
+
     num_classes = len(get_dataset_classes(dataset_bucket_name))
 
     #dataset_path = //BUCKET_DATASET
@@ -74,22 +74,52 @@ def train_save_resnet50(epochs=100):
 
 
 def train_save_vgg16():
-    dataset_path = "gs://chillmate_tiny_dataset/"
-    dataset_bucket_name = "chillmate_tiny_dataset"
+    dataset_path = "gs://chillmate-dataset-mix-0306/"
+    dataset_bucket_name = "chillmate-dataset-mix-0306"
     #dataset_path = "gs://chillmate_dataset/"
     #dataset_bucket_name = "chillmate_dataset"
+    #dataset_path = "gs://chillmate_tiny_dataset/"
+    #dataset_bucket_name = "chillmate_tiny_dataset"
     num_classes = len(get_dataset_classes(dataset_bucket_name))
 
     #dataset_path = //BUCKET_DATASET
 
     model = train_vgg16a(dataset_path)
 
-     # Save the model
+    # Save the model
     save_model(model, "vgg16")
 
     #model.summary()
 
     return None
+
+
+def train_save_vgg16al():
+    epochs = 30
+    #dataset_path = "gs://chillmate-dataset-mix-0306/train"
+    #dataset_bucket_name = "chillmate-dataset-mix-0306/train"
+    #dataset_path = "gs://chillmate_dataset/"
+    #dataset_bucket_name = "chillmate_dataset"
+    #dataset_path = "gs://chillmate_tiny_dataset/"
+    #dataset_bucket_name = "chillmate_tiny_dataset"
+    dataset_path = "/home/andreslemus/dataset_vegfru"
+    #dataset_bucket_name = "/home/andreslemus/dataset_vegfru"
+
+    #num_classes = len(get_dataset_classes(dataset_bucket_name))
+    num_classes=292
+
+    #dataset_path = //BUCKET_DATASET
+
+    model = train_vgg16al(dataset_path, num_classes, epochs)
+
+    # Save the model
+    save_model(model, "vgg16")
+
+    #model.summary()
+
+    return None
+
+
 
 
 def train_save_xception():
@@ -152,52 +182,40 @@ def predict(model_type, img_height, img_width):
     return None
 
 
-def pred_from_gcs(): # NOT IN USE AT THE MOMENT!!!!
-    """
-    Make a prediction using the latest trained model
-    """
+def predict_in_prod():
+    '''
+        Return a list of strings that correspond to the classes predicted.
+        It uses the most recent model specified in the variable model_type
+    '''
 
-    #class_names = get_dataset_classes()
+    class_names = get_dataset_classes(BUCKET_DATASET) # dataset reference classes
 
-    batch_size = 32
+    model_type= "vgg16" # model to use
     img_height = 348
     img_width = 348
 
-    model = load_trained_model(model_type="resnet50")
+    model = load_trained_model(model_type)
+    download_images_to_predict()
+    images_path = os.path.join(LOCAL_REGISTRY_PATH,'images-to-predict')
 
-    #image_path = f"/Users/andreslemus/code/alichap/chillmate-1372/raw_data/test_set_example/{image_to_test}.jpg"
-    #image_path = f"../chillmate-1372/raw_data/test_set_example/{image_to_test}.jpg"
-    #image_path = os.path.join(LOCAL_REGISTRY_PATH,'images-to-predict')
-    image_path = f"gs://{BUCKET_IMAGES_TO_PREDICT}/"
+    predictions_output = []
+    # Predict the class for each image in the folder images_to_predict
+    for filename in os.listdir(images_path):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            path_image_to_predict = os.path.join(images_path, filename)
 
-    client = storage.Client(project=GCP_PROJECT)
-    blobs = list(client.get_bucket(BUCKET_IMAGES_TO_PREDICT).list_blobs())
+            img = tf.keras.utils.load_img(path_image_to_predict, target_size=(img_height, img_width))
+            img_array = tf.keras.utils.img_to_array(img)
+            img_array = tf.expand_dims(img_array, 0)
 
-    # Predict the class for each image in the directory
-    for blob in blobs:
-        if blob.lower().endswith(('.png', '.jpg', '.jpeg')):
-            #path_image_to_predict = os.path.join(image_path, filename)
+            predictions = model.predict(img_array, verbose=0)
+            #print(predictions)
+            score = tf.nn.softmax(predictions[0])
 
-            print(f"\nPredicting {blob}")
+            current_prediction = class_names[np.argmax(score)]
+            predictions_output.append(current_prediction)
 
-            #img = tf.keras.utils.load_img(image_path, target_size=(img_height, img_width))
-            #img_array = tf.keras.utils.img_to_array(img)
-            #img_array = tf.expand_dims(img_array, 0) # Create a batch
-
-            #predictions = model.predict(img_array)
-            #score = tf.nn.softmax(predictions[0])
-
-            #print(
-            #    "This image most likely belongs to {} with a {:.2f} percent confidence."
-            #    .format(class_names[np.argmax(score)], 100 * np.max(score))
-            #    )
-        else:
-            print("Image is not .jpg, .jpeg or .png")
-            #pass
-            #return None
-
-    return None
-
+    return predictions_output
 
 
 
@@ -214,4 +232,6 @@ if __name__ == '__main__':
     #predict(model_type="vgg16", img_height=348, img_width=348)
     #predict(model_type="resnet50", img_height=100, img_width=100)
     #train_save_resnet50(5)
-    train_save_xception()
+    #train_save_xception()
+    #predict(model_type="vgg16", img_height=348, img_width=348)
+    print(predict_in_prod())

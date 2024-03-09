@@ -93,8 +93,11 @@ def train_resnet50(dataset_path, num_classes, epochs):
 
 if __name__ == '__main__':
     # Example usage
-    dataset_path = 'gs://chillmate_tiny_dataset/'
-    dataset_bucket_name = "chillmate_tiny_dataset"
+    #dataset_path = 'gs://chillmate_tiny_dataset/'
+    #dataset_bucket_name = "chillmate_tiny_dataset"
+
+    dataset_path = "gs://chillmate-dataset-mix-0306/train"
+    dataset_bucket_name = "chillmate-dataset-mix-0306/train"
 
     num_classes = len(get_dataset_classes(dataset_bucket_name))
-    train_resnet50(dataset_path, num_classes)
+    train_resnet50(dataset_path, num_classes, 2)
