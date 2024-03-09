@@ -12,6 +12,7 @@ app = FastAPI()
 def status():
     return {"API": "connected"}
 
+  
 #@app.get("/predict")
 #def predict(X):
 
@@ -29,3 +30,5 @@ params = {
 
 response = requests.get(url, params=params)
 response.json() #=> {wait: 64}
+
+
