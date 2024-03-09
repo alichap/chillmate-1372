@@ -4,6 +4,7 @@ raw_data/
 .ipynb_checkpoints
 .python-version
 *.ipynb
+*.pyc
 .env
 .DS_Store
 path_to_save_model/
