@@ -218,32 +218,14 @@ def predict_in_prod():
     return predictions_output
 
 
-def predict_in_prod_img(file):
+def predict_in_prod_img(img_path):
     '''
         Return a list of strings that correspond to the classes predicted.
         It uses the most recent model specified in the variable model_type
     '''
 
-    class_names = ['Apple',
-                   'Aubergine',
-                    'Avocado',
-                    'Banana',
-                    'Bean',
-                    'Broccoli',
-                    'Cabbage',
-                    'Carrots',
-                    'Corn',
-                    'Cucumber',
-                    'Egg',
-                    'Garlic',
-                    'Leek_lot',
-                    'Onion',
-                    'Pear',
-                    'Pepper',
-                    'Potato',
-                    'Salmon',
-                    'Tomato',
-                    'Zucchini'] # dataset reference classes
+    class_names = ['Apple','Aubergine','Avocado','Banana','Bean','Broccoli','Cabbage','Carrots','Corn','Cucumber',
+                    'Egg','Garlic','Leek_lot','Onion','Pear','Pepper','Potato','Salmon','Tomato','Zucchini'] # dataset reference classes
 
     model_type= "resnet50" # model to use
     img_height = 100
@@ -251,18 +233,15 @@ def predict_in_prod_img(file):
 
     model = load_trained_model(model_type)
 
-    predictions_output = []
-    # Predict the class for each image in the folder images_to_predict
-    img_array = tf.keras.utils.img_to_array(file)
+    # Predict image from query user
+    img = tf.keras.utils.load_img(img_path, target_size=(img_height, img_width))
+    img_array = tf.keras.utils.img_to_array(img)
     img_array = tf.expand_dims(img_array, 0)
     predictions = model.predict(img_array, verbose=0)
     score = tf.nn.softmax(predictions[0])
-
     current_prediction = class_names[np.argmax(score)]
-    predictions_output.append(current_prediction)
 
-    return predictions_output
-
+    return current_prediction
 
 
 if __name__ == '__main__':
