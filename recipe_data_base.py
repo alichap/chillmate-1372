@@ -27,7 +27,7 @@ def dict_data_base_setup():
     grouped_df = df_expanded.groupby('ingredients_clean')['Title'].agg(list).reset_index()
     dict_recipe= dict(zip(grouped_df['ingredients_clean'],grouped_df['Title']))
 
-    print(dict_recipe)
+    #print(dict_recipe)
     return dict_recipe
 
-dict_data_base_setup()
+#print(dict_data_base_setup().keys())
