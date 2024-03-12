@@ -21,6 +21,10 @@ from keras.models import model_from_json
 from keras.models import load_model
 from tensorflow.keras.applications.vgg16 import VGG16
 
+#Loading model
+def load_model():
+    model = VGG16(weights="imagenet", include_top=False, input_shape=(img_height, img_width, 3))
+    return model
 
 def train_vgg16a(dataset_path):
 
@@ -130,4 +134,4 @@ if __name__ == '__main__':
     dataset_bucket_name = "chillmate_tiny_dataset"
 
     #num_classes = len(get_dataset_classes(dataset_bucket_name))
-    train_vgg16a(dataset_path)
+    #train_vgg16a(dataset_path)
