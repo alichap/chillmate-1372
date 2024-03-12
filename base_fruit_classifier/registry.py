@@ -114,9 +114,6 @@ def load_trained_model_json(model_type) -> keras.Model:
 
     """
 
-    #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), "chillmate_models")
-
-
     if MODEL_TARGET == "local":
         print(Fore.BLUE + f"\nLoad latest model from local registry..." + Style.RESET_ALL)
 
@@ -149,12 +146,10 @@ def load_trained_model_json(model_type) -> keras.Model:
         print(blobs[2])
 
         try:
-    #         latest_blob = max(blobs, key=lambda x: x.updated)
             latest_model_path_to_save_json = os.path.join(LOCAL_REGISTRY_PATH,"chillmate-models",blobs[2].name)
             latest_model_path_to_save_h5 = os.path.join(LOCAL_REGISTRY_PATH,"chillmate-models",blobs[1].name)
             blobs[2].download_to_filename(latest_model_path_to_save_json)
             blobs[1].download_to_filename(latest_model_path_to_save_h5)
-
 
             json_file = open(latest_model_path_to_save_json, 'r')
             loaded_model_json = json_file.read()
@@ -162,7 +157,7 @@ def load_trained_model_json(model_type) -> keras.Model:
             model.load_weights(latest_model_path_to_save_h5)
 
 
-            print(model.summary())
+            #print(model.summary())
 
     #         latest_model = keras.models.load_model(latest_model_path_to_save)
     #         latest_model = load_model(latest_model_path_to_save)
@@ -301,7 +296,7 @@ def get_dataset_classes(dataset_bucket_name):
     # Extract the class names from the prefixes
     class_names = [prefix.split('/')[-2] for prefix in prefixes if prefix.endswith('/')]
     print("There are:", len(class_names), "classes")
-    #print(class_names)
+    print(class_names)
 
     return class_names
 
@@ -313,14 +308,16 @@ if __name__ == '__main__':
     #pass
 
     #dataset_path = "gs://chillmate_tiny_dataset/"
-    #dataset_bucket_name = "chillmate_tiny_dataset"
-    #get_dataset_classes(dataset_bucket_name)
+    dataset_bucket_name = "chillmate-dataset-mix-0306"
+    get_dataset_classes(dataset_bucket_name)
     #print(get_dataset_classes(dataset_bucket_name))
 
-    model = load_trained_model_json("xception")
+
     #model.summary()
 
     #count_items_in_bucket_dataset()
     #images1 = download_images_to_predict()
     #for i in images1:
     #    print(i)
+
+    #model = load_trained_model_json("xception")

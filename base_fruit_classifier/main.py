@@ -212,7 +212,14 @@ def predict_in_prod():
             img_array = tf.keras.utils.img_to_array(img)
             img_array = tf.expand_dims(img_array, 0)
 
+
+            opt = optimizers.Adam(learning_rate=1e-3)
+            model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                  optimizer=opt,
+                  metrics=['accuracy'])
+
             predictions = model.predict(img_array, verbose=0)
+
             #print(predictions)
             score = tf.nn.softmax(predictions[0])
 
@@ -237,12 +244,23 @@ def predict_in_prod_img(img_path):
     img_height = 100
     img_width = 100
 
+
+
     model = load_trained_model_json(model_type)
+
+
 
     # Predict image from query user
     img = tf.keras.utils.load_img(img_path, target_size=(img_height, img_width))
     img_array = tf.keras.utils.img_to_array(img)
     img_array = tf.expand_dims(img_array, 0)
+
+    opt = optimizers.Adam(learning_rate=1e-3)
+    model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                  optimizer=opt,
+                  metrics=['accuracy'])
+
+
     predictions = model.predict(img_array, verbose=0)
     score = tf.nn.softmax(predictions[0])
     current_prediction = class_names[np.argmax(score)]
@@ -265,4 +283,4 @@ if __name__ == '__main__':
     #train_save_resnet50(5)
     #train_save_xception()
     #predict(model_type="vgg16", img_height=348, img_width=348)
-    print(predict_in_prod())
+    print(predict_in_prod_img())
