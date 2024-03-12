@@ -8,6 +8,8 @@ import io
 from colorama import Fore, Style
 from tensorflow import keras
 from google.cloud import storage
+from keras.models import load_model
+from keras.models import model_from_json, load_model
 
 from base_fruit_classifier.params import *
 
@@ -85,8 +87,9 @@ def load_trained_model(model_type) -> keras.Model:
             latest_model_path_to_save = os.path.join(LOCAL_REGISTRY_PATH,"chillmate-models",latest_blob.name)
             latest_blob.download_to_filename(latest_model_path_to_save)
 
-            latest_model = keras.models.load_model(latest_model_path_to_save)
-
+            #latest_model = keras.models.load_model(latest_model_path_to_save)
+            latest_model = load_model(latest_model_path_to_save)
+            print(latest_model)
 
             print("👍 Latest model downloaded from cloud storage")
 
@@ -103,6 +106,85 @@ def load_trained_model(model_type) -> keras.Model:
     else:
         print("CONNECTION TO GCP NOT YET AVAILABLE. ASK ANDRES")
         return None
+
+
+
+def load_trained_model_json(model_type) -> keras.Model:
+    """
+
+    """
+
+    #LOCAL_REGISTRY_PATH = os.path.join(os.path.expanduser('~'), "chillmate_models")
+
+
+    if MODEL_TARGET == "local":
+        print(Fore.BLUE + f"\nLoad latest model from local registry..." + Style.RESET_ALL)
+
+        # Get the latest model version name by the timestamp on disk
+        local_model_directory = os.path.join(LOCAL_REGISTRY_PATH, "models")
+        local_model_paths = glob.glob(f"{local_model_directory}/*")
+
+        if not local_model_paths:
+            return None
+
+        most_recent_model_path_on_disk = sorted(local_model_paths)[-1]
+
+        print(Fore.BLUE + f"\nLoad latest model from disk..." + Style.RESET_ALL)
+
+        latest_model = keras.models.load_model(most_recent_model_path_on_disk)
+
+        print("👍 Model loaded from local disk")
+
+        return latest_model
+
+
+    elif MODEL_TARGET == "gcs":
+
+        print(Fore.BLUE + f"\nLoading latest model from GCS..." + Style.RESET_ALL)
+
+        client = storage.Client(project=GCP_PROJECT)
+        #blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models"))
+        blobs = list(client.get_bucket(BUCKET_MODELS).list_blobs(prefix=model_type))
+
+        print(blobs[2])
+
+        try:
+    #         latest_blob = max(blobs, key=lambda x: x.updated)
+            latest_model_path_to_save_json = os.path.join(LOCAL_REGISTRY_PATH,"chillmate-models",blobs[2].name)
+            latest_model_path_to_save_h5 = os.path.join(LOCAL_REGISTRY_PATH,"chillmate-models",blobs[1].name)
+            blobs[2].download_to_filename(latest_model_path_to_save_json)
+            blobs[1].download_to_filename(latest_model_path_to_save_h5)
+
+
+            json_file = open(latest_model_path_to_save_json, 'r')
+            loaded_model_json = json_file.read()
+            model = model_from_json(loaded_model_json)
+            model.load_weights(latest_model_path_to_save_h5)
+
+
+            print(model.summary())
+
+    #         latest_model = keras.models.load_model(latest_model_path_to_save)
+    #         latest_model = load_model(latest_model_path_to_save)
+    #         print(latest_model)
+
+    #         print("👍 Latest model downloaded from cloud storage")
+
+    #         latest_model_name_fetched = latest_blob.name
+    #         print("The model fetched is:", latest_model_name_fetched)
+
+            return model
+        except:
+            print(f"\n🙁 No model found in GCS bucket {BUCKET_MODELS}")
+
+    #         return None
+
+
+    # else:
+    #     print("CONNECTION TO GCP NOT YET AVAILABLE. ASK ANDRES")
+    #     return None
+
+
 
 
 
@@ -235,8 +317,8 @@ if __name__ == '__main__':
     #get_dataset_classes(dataset_bucket_name)
     #print(get_dataset_classes(dataset_bucket_name))
 
-    model = load_trained_model(model_type="resnet50")
-    model.summary()
+    model = load_trained_model_json("xception")
+    #model.summary()
 
     #count_items_in_bucket_dataset()
     #images1 = download_images_to_predict()

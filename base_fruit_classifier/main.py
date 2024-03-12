@@ -190,11 +190,15 @@ def predict_in_prod():
 
     class_names = get_dataset_classes(BUCKET_DATASET) # dataset reference classes
 
-    model_type= "resnet50" # model to use
+    model_type= "xception" # model to use
     img_height = 100
     img_width = 100
 
-    model = load_trained_model(model_type)
+    #model_type= "vgg16" # model to use
+    #img_height = 348
+    #img_width = 348
+
+    model = load_trained_model_json(model_type)
     download_images_to_predict()
     images_path = os.path.join(LOCAL_REGISTRY_PATH,'images-to-predict')
 
@@ -229,11 +233,11 @@ def predict_in_prod_img(img_path):
 
     class_names = get_dataset_classes(BUCKET_DATASET) # dataset reference classes
 
-    model_type= "resnet50" # model to use
+    model_type= "xception" # model to use
     img_height = 100
     img_width = 100
 
-    model = load_trained_model(model_type)
+    model = load_trained_model_json(model_type)
 
     # Predict image from query user
     img = tf.keras.utils.load_img(img_path, target_size=(img_height, img_width))
