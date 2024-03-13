@@ -15,7 +15,7 @@ COPY base_fruit_classifier base_fruit_classifier
 COPY setup.py setup.py
 RUN pip install .
 
-#EXPOSE 8000
+#EXPOSE 8080
 
 # controls functinnality of the container
 # uvicorn to control the server port
