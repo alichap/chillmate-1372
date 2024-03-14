@@ -33,7 +33,7 @@ async def create_upload_file(file: UploadFile= File(...)):
     prediction = predict_in_prod_img(img_path)
 
     return {#"label": prediction,
-            "img": img_path
+            "img": prediction
             }
 
 @app.get("/recipe")
