@@ -1,6 +1,6 @@
 from recipe_data_base  import *
 
-list_cnn = ['spinach','chicken'] # to change
+#list_cnn = ['spinach','chicken'] # to change
 
 dict_recipe = dict_data_base_setup()
 def find_common_recipe(list_ing, dict_recipe):
@@ -17,4 +17,4 @@ def find_common_recipe(list_ing, dict_recipe):
 
     return common_recipe
 
-find_common_recipe(list_cnn, dict_recipe)
+#find_common_recipe(list_cnn, dict_recipe)

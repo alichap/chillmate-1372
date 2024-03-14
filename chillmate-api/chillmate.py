@@ -6,16 +6,20 @@ from recipe_data_base import *
 from recipe_proposal import *
 
 app = FastAPI()
-list_cnn = ['spinach','chicken']
+#list_cnn = ['spinach','chicken']
 # define root
 # first endpoint
+
+dict_ing={
+"1":"tomatoes",
+"2":"chicken",
+"3":"carrots"
+}
 @app.get("/")
 def status():
-    dict_recipe = dict_data_base_setup()
-    recipe_list=find_common_recipe(list_cnn, dict_recipe)
-    return {"API": "connected",
+    return {"API": "connected"
             #"recipe_data_base": dict_recipe #dict of recipe ing as key, recipe title as value
-            "recipe list": recipe_list
+           # "recipe list": recipe_list
             }
 
 
@@ -32,5 +36,10 @@ async def create_upload_file(file: UploadFile= File(...)):
             "img": img_path
             }
 
-#@app.get("/recipe")
-#def get_recipe ()
+@app.get("/recipe")
+def get_recipe ():
+    dict_recipe = dict_data_base_setup()
+    list_ing= list(dict_ing.values())
+    recipe_list=find_common_recipe(list_ing, dict_recipe)
+    return {"recipe": recipe_list
+            }
