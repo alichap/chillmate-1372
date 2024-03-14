@@ -6,6 +6,7 @@ raw_data/
 *.ipynb
 *.pyc
 .env
+*.jpg
 .DS_Store
 path_to_save_model/
 logs/
