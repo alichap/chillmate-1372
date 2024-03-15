@@ -143,7 +143,7 @@ def load_trained_model_json(model_type) -> keras.Model:
         #blobs = list(client.get_bucket(BUCKET_NAME).list_blobs(prefix="models"))
         blobs = list(client.get_bucket(BUCKET_MODELS).list_blobs(prefix=model_type))
 
-        print(blobs[2])
+        #print(blobs[2])
 
         try:
             latest_model_path_to_save_json = os.path.join(LOCAL_REGISTRY_PATH,"chillmate-models",blobs[2].name)
@@ -171,8 +171,7 @@ def load_trained_model_json(model_type) -> keras.Model:
             return model
         except:
             print(f"\n🙁 No model found in GCS bucket {BUCKET_MODELS}")
-
-    #         return None
+            return None
 
 
     # else:
@@ -320,4 +319,4 @@ if __name__ == '__main__':
     #for i in images1:
     #    print(i)
 
-    #model = load_trained_model_json("xception")
+    print(load_trained_model_json("xception"))

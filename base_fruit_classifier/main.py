@@ -283,4 +283,4 @@ if __name__ == '__main__':
     #train_save_resnet50(5)
     #train_save_xception()
     #predict(model_type="vgg16", img_height=348, img_width=348)
-    print(predict_in_prod_img())
+    print(predict_in_prod())
